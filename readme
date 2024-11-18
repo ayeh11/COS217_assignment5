@@ -98,7 +98,106 @@ particular, what bugs are in your submission?
 ------------------------------------------------------------------------
 What is your mywc program test plan?
 
+Boundary tests:
+mywc001.txt: This file contains nothing and is empty. It tests the 
+boundary condition where there's no input in the file. It causes the 
+computer to execute line 30, realize there's no input (EOF), then 
+skip to line 52. Since iInWord is FALSE, we go to line 55, which prints
+0 lines, 0 words, and 0 chars. Finally, it returns 0 on line 56 of the 
+given mywc.c file with no errors.
 
+mywc002.txt: This file contains a space character. It tests the boundary
+condition where the input contains only a whitespace character with no
+words or newlines. It causes the computer to execute line 30, take 
+in the char since it's not EOF, increment lCharCount with line 32, 
+realize it's a space with line 34, but iInWord is FALSE on line 36. The
+computer skips to line 48, where it's not a new line, and exits the 
+loop. Since iInWord is FALSE, line 52 is skipped and line 55 prints the
+counts to be 0 line, 0 words, and 1 char. Line 56 returns 0 with no 
+errors.
+
+mywc003.txt: This file contains a newline character \n. It tests the 
+boundary condition where the input has no words and only a newline. It
+causes the computer to execute line 30, take in the char since it's
+not EOF, increment lCharCount with line 32, realize it's not a space 
+with line 34, go to the else statement, and make iInWord is TRUE with 
+lines 44 and 45. Then realizing it's a newline at line 48, it'll 
+increment the lLineCount at line 49 and exit the loop with the end of 
+the file. Since iInWord is TRUE from line 45, line 52 is TRUE and line 
+53 increments the lWordCount. Line 55 prints the counts to be 1 line, 
+1 word, and 1 char. Line 56 returns 0 with no errors.
+
+mywc004.txt: This file contains multiple whitespace characters (space, 
+new line, 2 spaces, newline). It tests the boundary condition where the
+input has only different types of whitespace characters. It causes the 
+computer to execute line 30, take in the char since it's not EOF, 
+increment lCharCount with line 32, realize it's a space with 
+line 34, but iInWord is FALSE on line 36. The computer skips to line 48,
+where it's not a new line, and goes back to line 30. It increments the 
+lCharCount with line 32, and skips to line 48 where the lLineCount is 
+incremented. It loops again, following the previous lines hit by the 
+first space since iInWord is still FALSE. After the whitespace 
+characters, it exits the loop. Since iInWord is FALSE, line 52 is 
+skipped and line 55 prints the counts to be 2 lines, 0 words, and 5
+chars. Line 56 returns 0 with no errors.
+
+mywc005.txt: This file contains only the word hello. It tests the 
+statement case where the input is only a word with no whitespace. 
+It causes the computer to execute line 30, take in the char since it's
+not EOF, increment lCharCount with line 32, realize it's not a space 
+with line 34, go to the else statement, and make iInWord is TRUE with 
+lines 44 and 45. At line 48, it knows the char isn't newline, so it does
+back up to line 30 to loop the same lines again, incrementing 
+lCharCount. After 'o', it'll exit the loop. Since iInWord is TRUE from 
+line 45 still, line 52 is TRUE and line 53 increments the lWordCount. 
+Line 55 prints the counts to be 0 lines, 1 word, and 5 chars. Line 56 
+returns 0 with no errors.
+
+mywc006.txt: This file contains a single word hello followed by a new 
+line and a space. It tests the statement case where the input that 
+ends with whitespace in different forms after a word input. It causes 
+the computer to execute line 30, take in the char since it's not EOF, 
+increment lCharCount with line 32, go through the same lines as 
+mywc005.txt for the word. After 'o', the newline input will increment
+the line count with lines 48 and 49. The next input is the space, which
+increments the lWordCount in line 38 through passing the conditions on 
+lines 34 and 36, setting iInWord to FALSE. This lets the function to not
+count an extra word on line 53. Line 55 prints the counts to be 1 line, 
+1 word, and 7 chars. Line 56 returns 0 with no errors.
+
+mywc007.txt: This file contains the text hello world with 1 space in 
+between the words. It tests the statement case where the input has words
+separated by 1 space, as expected. It causes the computer to execute
+line 30, take in the char since it's not EOF, increment lCharCount with
+line 32, go through the same lines as mywc005.txt for the word. After 
+'o', the space will increment the lWordCount in line 38 through 
+passing the conditions on lines 34 and 36, setting iInWord to FALSE. 
+Since there is no new line char for line 48, the computer goes back to 
+line 30 for the new word, going thorugh the same lines as mywc005.txt 
+for the next word. Finishing that loop with iInWord being TRUE, the 
+lWordCount is incremented with lines 52 and 53. Line 55 prints the 
+counts to be 0 lines, 2 words, and 11 chars. Line 56 returns 0 with no 
+errors.
+
+mywc008.txt: This file contains a word consisting of 10,000 'a'
+characters without any whitespace. It is a stress test for the program
+to handle very long words. It causes the computer to execute the same
+lines as mywc005.txt, but to looping 10,000 times. Line 55 prints the 
+counts to be 0 lines, 1 word, and 10,000 chars. Line 56 returns 0 with 
+no errors.
+
+mywc009.txt: This file contains the word 'word' repeated 10,000 times 
+with spaces in between. It is a stress test for the program to handle 
+a large number of words. It causes the computer to execute the same
+lines as mywc006.txt, but to looping 10,000 times. Line 55 prints the 
+counts to be 0 lines, 10,000 words, and 50,000 chars. Line 56 returns 0
+with no errors.
+
+mywc010.txt: This file contains 999 newline characters. It is a stress
+test for the program to handle a large number of lines. It causes the 
+computer to execute the same lines as mywc003.txt, but to looping 
+999 times. The program should report 999 lines, zero words, and 999 
+characters.
 
 ------------------------------------------------------------------------
 What are the CPU times consumed by the programs from Parts 2a, 2b, 2d,
