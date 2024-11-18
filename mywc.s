@@ -23,7 +23,7 @@ lWordCount:
 lCharCount:
         .quad   0      // long
 iInWord:
-        .quad   0      // int
+        .word   0      // int
 
 //----------------------------------------------------------------------
         .section .bss
@@ -51,82 +51,81 @@ main:
         str     x30, [sp]
 
 readLoop:
-        // iChar = getchar()
-        bl      getchar
-        adr     x0, iChar
-        str     w0, [x0]
-
         // if (iChar == EOF) goto readLoopEnd;
-        ldr     w1, [x0]
-        cmp     w1, -1
+        bl      getchar
+        mov     w4, w0 // w4 has char too, getchar overwrites w0
+        cmp     w0, -1
         beq     readLoopEnd
 
         // lCharCount++;
-        adr     x0, lCharCount
-        ldr     x1, [x0]
-        add     x1, x1, 1
-        str     x1, [x0]
+        adr     x1, lCharCount
+        ldr     x2, [x1]
+        add     x2, x2, 1
+        str     x2, [x1]
 
         // if (!isspace(iChar)) goto notSpace;
-        ldrsw   x1, [x0] 
+        mov     w0, w4 // Move preserved character to w0 for isspace
         bl      isspace
         cbz     w0, notSpace
 
         // if (!iInWord) goto checkNewline;
-        adr     x0, iInWord
-        ldr     w2, [x0]
-        cmp     w2, 0
+        adr     x1, iInWord
+        ldr     x2, [x1]
+        cmp     x2, FALSE
         beq     checkNewline
 
         // lWordCount++;
-        adr     x0, lWordCount
-        ldr     x1, [x0]
-        add     x1, x1, 1
-        str     x1, [x0]
+        adr     x1, lWordCount
+        ldr     x2, [x1]
+        add     x2, x2, 1
+        str     x2, [x1]
 
         // iInWord = FALSE;
-        mov     w1, #0
-        str     w1, [x0]
+        adr     x1, iInWord
+        mov     x2, FALSE
+        str     x2, [x1]
 
         // goto checkNewline;
         b       checkNewline
 
 notSpace:
         // if (iInWord) goto checkNewline;
-        adr     x0, iInWord
-        ldr     w1, [x0]
-        cbnz    w1, checkNewline
+        adr     x1, iInWord
+        ldr     x2, [x1]
+        cbnz    x2, checkNewline
 
         // iInWord = TRUE;
-        mov     w1, 1
-        str     w1, [x0]
+        adr     x1, iInWord
+        mov     x2, TRUE
+        str     x2, [x1]
 
 checkNewline:
         // if (iChar != '\n') goto readLoop;
-        ldr     w1, [x0]
-        cmp     w1, newlineStr
+        adr     x1, newlineStr
+        ldrb    w2, [x1]
+        cmp     w4, w2
         bne     readLoop
 
         // lLineCount++;
-        adr     x0, lLineCount
-        ldr     x1, [x0]
-        add     x1, x1, 1
-        str     x1, [x0]
+        adr     x1, lLineCount
+        ldr     x2, [x1]
+        add     x2, x2, 1
+        str     x2, [x1]
 
         // goto readLoop;
         b       readLoop
 
 readLoopEnd:
         // if (!iInWord) goto printCounts;
-        adr     x0, iInWord
-        ldr     w1, [x0]
-        cbz     w1, printCounts
+        adr     x1, iInWord
+        ldr     x2, [x1]
+        cbz     x2, printCounts
 
         // lWordCount++;
-        adr     x0, lWordCount
-        ldr     x1, [x0]
-        add     x1, x1, 1
-        str     x1, [x0]
+        adr     x1, lWordCount
+        ldr     x2, [x1]
+        add     x2, x2, 1
+        str     x2, [x1]
 
 printCounts:
         // printf("%7ld %7ld %7ld\n", lLineCount, lWordCount, lCharCount);
