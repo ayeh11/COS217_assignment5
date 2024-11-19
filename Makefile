@@ -1,7 +1,7 @@
 GCC = gcc217 -g
 #GCC = gcc217m
 
-all: mywcc mywcs
+all: mywcc mywcs fib
 
 clean:
 	rm -f $(TARGETS) meminfo*.out

@@ -123,9 +123,9 @@ not EOF, increment lCharCount with line 32, realize it's not a space
 with line 34, go to the else statement, and make iInWord is TRUE with 
 lines 44 and 45. Then realizing it's a newline at line 48, it'll 
 increment the lLineCount at line 49 and exit the loop with the end of 
-the file. Since iInWord is TRUE from line 45, line 52 is TRUE and line 
-53 increments the lWordCount. Line 55 prints the counts to be 1 line, 
-1 word, and 1 char. Line 56 returns 0 with no errors.
+the file. Since iInWord is FALSE from line 45, line 52 is FALSE and 
+line 53 is skipped. Line 55 prints the counts to be 1 line, 0 words, 
+and 1 char. Line 56 returns 0 with no errors.
 
 mywc004.txt: This file contains multiple whitespace characters (space, 
 new line, 2 spaces, newline). It tests the boundary condition where the
@@ -179,31 +179,38 @@ lWordCount is incremented with lines 52 and 53. Line 55 prints the
 counts to be 0 lines, 2 words, and 11 chars. Line 56 returns 0 with no 
 errors.
 
-mywc008.txt: This file contains a word consisting of 10,000 'a'
+mywc008.txt: This file contains a word consisting of 50,000 'a'
 characters without any whitespace. It is a stress test for the program
 to handle very long words. It causes the computer to execute the same
-lines as mywc005.txt, but to looping 10,000 times. Line 55 prints the 
-counts to be 0 lines, 1 word, and 10,000 chars. Line 56 returns 0 with 
+lines as mywc005.txt, but to looping 50,000 times. Line 55 prints the 
+counts to be 0 lines, 1 word, and 50,000 chars. Line 56 returns 0 with 
 no errors.
 
-mywc009.txt: This file contains the word 'word' repeated 10,000 times 
-with spaces in between. It is a stress test for the program to handle 
-a large number of words. It causes the computer to execute the same
-lines as mywc006.txt, but to looping 10,000 times. Line 55 prints the 
-counts to be 0 lines, 10,000 words, and 50,000 chars. Line 56 returns 0
-with no errors.
+mywc009.txt: This file contains all the legal chars for the assignment.
+As indivudal chars have been tested by previous test text, this file 
+combines all those tests together in a loop form. getchar() should be
+able to read all of them. Line 55 prints the counts to be 1 line from 
+the newline character, 1 word, and 97 chars. Line 56 returns 0 with no 
+errors.
 
-mywc010.txt: This file contains 999 newline characters. It is a stress
+mywc010.txt: This file contains 1000 newline characters. It is a stress
 test for the program to handle a large number of lines. It causes the 
 computer to execute the same lines as mywc003.txt, but to looping 
-999 times. The program should report 999 lines, zero words, and 999 
+999 times. The program should report 1000 lines, zero words, and 1000 
 characters.
+
+mywc011.txt: This file contains 50,000 characters that are randomly 
+generated. It is a stress test for the program to handle a large number 
+of characters of a wide range. It causes the computer to execute the 
+same lines as previous tests, but to looping with random generation can
+expose an issue. The program should report 513 lines, 1463 words, and 
+50,000 characters.
 
 ------------------------------------------------------------------------
 What are the CPU times consumed by the programs from Parts 2a, 2b, 2d,
 2e, and 2f to compute fib(250000) on armlab? Fill in the blanks.
 
-Part 2a:  _____ seconds
+Part 2a:  11.981942 seconds
 
 Part 2b:  _____ seconds
 
