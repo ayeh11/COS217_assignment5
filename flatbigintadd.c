@@ -77,19 +77,19 @@ int BigInt_add(BigInt_T oAddend1, BigInt_T oAddend2, BigInt_T oSum)
 
     add_first_addend:
         ulSum += oAddend1->aulDigits[lIndex];
-        if (ulSum < oAddend1->aulDigits[lIndex]) goto check_overflow;
+        if (ulSum < oAddend1->aulDigits[lIndex]) goto overflow;
         else goto add_second_addend;
 
-    check_overflow:
+    overflow:
         ulCarry = 1;
         goto add_second_addend;
 
     add_second_addend:
         ulSum += oAddend2->aulDigits[lIndex];
-        if (ulSum < oAddend2->aulDigits[lIndex]) goto check_overflow2;
+        if (ulSum < oAddend2->aulDigits[lIndex]) goto overflow2;
         else goto store_sum;
 
-    check_overflow2:
+    overflow2:
         ulCarry = 1;
         goto store_sum;
 

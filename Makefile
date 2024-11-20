@@ -1,13 +1,31 @@
 GCC = gcc217 -g
 #GCC = gcc217m
 
-all: mywcc mywcs fib
+all: mywcc mywcs fibc fibs
 
 clean:
 	rm -f $(TARGETS) meminfo*.out
 
 clobber: clean
-	rm -f mywcs.o mywcc.o *~
+	rm -f mywcs.o mywcc.o fibc fibs *.o *~
+
+fibc: fib.o bigint.o bigintadd.o
+	$(GCC) fib.o bigint.o bigintadd.o -o fibc
+
+fibs: fib.o bigint.o bigintadds.o
+	$(GCC) fib.o bigint.o bigintadds.o -o fibs
+
+fib.o: fib.c
+	$(GCC) -c fib.c -o fib.o
+
+bigint.o: bigint.c
+	$(GCC) -c bigint.c -o bigint.o
+
+bigintadd.o: bigintadd.c
+	$(GCC) -c bigintadd.c -o bigintadd.o
+
+bigintadds.o: bigintadd.s
+	$(GCC) -c bigintadd.s -o bigintadds.o
 
 mywcc: mywcc.o
 	$(GCC) mywcc.o -o mywcc
