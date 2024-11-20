@@ -20,3 +20,11 @@ mywcc.o: mywc.c
 
 mywcs.o: mywc.s
 	$(GCC) -c mywc.s -o mywcs.o
+
+
+# 2a. gcc217 -o fib fib.c bigint.c bigintadd.c
+# 2b. gcc217 -o fib fib.c bigint.c bigintadd.c -D NDEBUG -O
+# 2c. gcc217 -o fib fib.c bigint.c bigintadd.c -D NDEBUG -O -pg
+#		gprof fib > performance
+# 2d. gcc217 -o fib fib.c bigint.c flatbigintadd.c
+
