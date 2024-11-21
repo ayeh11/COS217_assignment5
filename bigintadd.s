@@ -158,11 +158,9 @@ adding:
     str     x0, [sp, ULSUM_OFFSET]
     mov     x0, 0
     str     x0, [sp, ULCARRY_OFFSET]
-    b       add_first_addend
 
-// ulSum += oAddend1->aulDigits[lIndex]; 
-// if (ulSum < oAddend1->aulDigits[lIndex])
-add_first_addend:
+    // ulSum += oAddend1->aulDigits[lIndex]; 
+    // if (ulSum < oAddend1->aulDigits[lIndex])
     ldr     x1, [sp, OADDEND1_OFFSET]
     add     x1, x1, AULDIGITS
     ldr     x2, [sp, LINDEX_OFFSET]
@@ -258,4 +256,3 @@ return_end:
     ret
 
     .size   BigInt_add, (. - BigInt_add)
-    

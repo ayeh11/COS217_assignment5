@@ -68,9 +68,6 @@ int BigInt_add(BigInt_T oAddend1, BigInt_T oAddend2, BigInt_T oSum)
 
     add_loop_condition:
         if (lIndex >= lSumLength) goto check_last_carry;
-        else goto adding;
-
-    adding:
         ulSum = ulCarry;
         ulCarry = 0;
         goto add_first_addend;
