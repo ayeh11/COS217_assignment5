@@ -80,10 +80,10 @@ return_larger:
 
 
         //--------------------------------------------------------------
-        // Write to stdout counts of how many lines, words, and 
-        // characters are in stdin. A word is a sequence of 
-        // non-whitespace characters. Whitespace is defined by the 
-        // isspace() function. Return 0.
+        // Assign the sum of oAddend1 and oAddend2 to oSum.  
+        // oSum should be distinct from oAddend1 and oAddend2.  
+        // Return 0 (FALSE) if an overflow occurred, and 1 (TRUE) 
+        // otherwise.
         //--------------------------------------------------------------
 
     // Must be a multiple of 16

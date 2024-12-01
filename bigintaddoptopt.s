@@ -1,8 +1,7 @@
 //----------------------------------------------------------------------
-// bigintaddopt.s
+// bigintaddoptopt.s
 // Authors: Annika Yeh and William Oh
 //----------------------------------------------------------------------
-
 .equ    FALSE, 0
 .equ    TRUE, 1
 
@@ -15,63 +14,14 @@
 //----------------------------------------------------------------------
         .section .rodata
 
-//----------------------------------------------------------------------
+//----------------------------------------------------------------------      
         .section .data
 
-//----------------------------------------------------------------------
+//----------------------------------------------------------------------      
         .section .bss
 
-//----------------------------------------------------------------------
+//----------------------------------------------------------------------      
         .section .text
-
-        //--------------------------------------------------------------
-        // Return the larger of lLength1 and lLength2.
-        //--------------------------------------------------------------
-
-    // Parameter registers
-    lLength1   .req x19
-    lLength2   .req x20
-    lLarger    .req x21
-
-    .global BigInt_larger
-
-BigInt_larger:
-    // Prolog
-    sub     sp, sp, 32 
-    stp     x19, x20, [sp, 0]
-    stp     x21, x30, [sp, 16]
-
-    // Move into registers
-    mov     lLength1, x0
-    mov     lLength2, x1
-
-    // if (lLength1 > lLength2) 
-    cmp     lLength1, lLength2
-    bgt     set_lLength1
-    b       set_lLength2
-
-// lLarger = lLength1; 
-set_lLength1:
-    mov     lLarger, lLength1
-    b       return_larger
-
-// lLarger = lLength2; 
-set_lLength2:
-    mov     lLarger, lLength2
-    b       return_larger
-
-// return lLarger; 
-return_larger:
-    mov     x0, lLarger
-
-    // Epilog and return
-    ldp     x21, x30, [sp, 16]
-    ldp     x19, x20, [sp, 0]
-    add     sp, sp, 32
-    ret
-
-    .size   BigInt_larger, (. - BigInt_larger)
-
 
         //--------------------------------------------------------------
         // Assign the sum of oAddend1 and oAddend2 to oSum.  
@@ -102,11 +52,12 @@ BigInt_add:
     mov     oAddend2, x1 
     mov     oSum, x2 
 
-    // lSumLength = BigInt_larger(oAddend1->lLength, oAddend2->lLength);
-    ldr     x0, [oAddend1, LLENGTH]
-    ldr     x1, [oAddend2, LLENGTH]
-    bl      BigInt_larger
-    mov     lSumLength, x0
+    // Inline BigInt_larger:
+    // lSumLength = (oAddend1->lLength > oAddend2->lLength) ? oAddend1->lLength : oAddend2->lLength
+    ldr     x0, [oAddend1, LLENGTH]   // Load oAddend1->lLength into x19
+    ldr     x1, [oAddend2, LLENGTH]   // Load oAddend2->lLength into x20
+    cmp     x0, x1                   // Compare lLength1 and lLength2
+    csel    lSumLength, x0, x1, gt          // lSumLength = (x19 > x20) ? x19 : x20
 
     // if (oSum->lLength > lSumLength)
     ldr     x0, [oSum, LLENGTH]
@@ -117,7 +68,7 @@ BigInt_add:
 
 // memset(oSum->aulDigits, 0, MAX_DIGITS * sizeof(unsigned long));
 clear_oSum:
-    mov     x1, oSum   
+    mov     x1, oSum
     add     x0, x1, AULDIGITS
     mov     w1, 0
     ldr     x2, =MAX_DIGITS_SIZE
@@ -218,4 +169,3 @@ return_end:
     ret
 
     .size   BigInt_add, (. - BigInt_add)
-    
