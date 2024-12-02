@@ -54,15 +54,14 @@ BigInt_add:
 
     // Inline BigInt_larger:
     // lSumLength = (oAddend1->lLength > oAddend2->lLength) ? oAddend1->lLength : oAddend2->lLength
-    ldr     x0, [oAddend1, LLENGTH]   // Load oAddend1->lLength into x19
-    ldr     x1, [oAddend2, LLENGTH]   // Load oAddend2->lLength into x20
+    ldr     x0, [oAddend1, LLENGTH]   // Load oAddend1->lLength into x0
+    ldr     x1, [oAddend2, LLENGTH]   // Load oAddend2->lLength into x1
     cmp     x0, x1                   // Compare lLength1 and lLength2
-    csel    lSumLength, x0, x1, gt          // lSumLength = (x19 > x20) ? x19 : x20
+    csel    x25, x0, x1, gt          // lSumLength = (x0 > x1) ? x0 : x1
 
     // if (oSum->lLength > lSumLength)
     ldr     x0, [oSum, LLENGTH]
-    mov     x1, lSumLength
-    cmp     x0, x1
+    cmp     x0, x25
     bgt     clear_oSum
     b       skip_clear_oSum
 
@@ -73,26 +72,21 @@ clear_oSum:
     mov     w1, 0
     ldr     x2, =MAX_DIGITS_SIZE
     bl      memset
-    b       add_loop
+    b       add_loop_init
 
 skip_clear_oSum:
-    b       add_loop
+    b       add_loop_init
 
 // ulCarry = 0; lIndex = 0;
-add_loop:
+add_loop_init:
     mov     ulCarry, 0
     mov     lIndex, 0
 
-// if (lIndex >= lSumLength)
-add_loop_condition:
-    cmp     x24, lSumLength
-    bge     check_last_carry
-    b       adding
-
-// ulSum = ulCarry; ulCarry = 0;
-adding:
+// Guarded loop start
+add_loop:
+    // ulSum = ulCarry; ulCarry = 0;
     mov     ulSum, ulCarry
-    mov     ulCarry, 0  
+    mov     ulCarry, 0   
 
     // ulSum += oAddend1->aulDigits[lIndex]; 
     // if (ulSum < oAddend1->aulDigits[lIndex])
@@ -126,7 +120,16 @@ store_sum:
     add     x1, oSum, AULDIGITS
     str     ulSum, [x1, lIndex, LSL 3]
     add     lIndex, lIndex, 1
-    b       add_loop_condition
+
+    // end checks
+    // lIndex < lSumLength
+    cmp     lIndex, lSumLength   
+    bge     check_last_carry 
+
+    // lIndex < MAX_DIGITS
+    cmp     lIndex, #MAX_DIGITS
+    bge     return_false
+    b       add_loop
 
 // if (ulCarry != 1)
 check_last_carry:
