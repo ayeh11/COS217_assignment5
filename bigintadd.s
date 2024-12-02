@@ -129,7 +129,7 @@ BigInt_add:
 clear_oSum:
     ldr     x0, [sp, OSUM_OFFSET]
     add     x0, x0, AULDIGITS
-    mov     w1, 0
+    mov     x1, 0
     mov     x2, MAX_DIGITS_SIZE
     bl      memset
     b       add_loop

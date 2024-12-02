@@ -119,7 +119,7 @@ BigInt_add:
 clear_oSum:
     mov     x1, oSum   
     add     x0, x1, AULDIGITS
-    mov     w1, 0
+    mov     x1, 0
     ldr     x2, =MAX_DIGITS_SIZE
     bl      memset
     b       add_loop
@@ -134,7 +134,7 @@ add_loop:
 
 // if (lIndex >= lSumLength)
 add_loop_condition:
-    cmp     x24, lSumLength
+    cmp     lIndex, lSumLength
     bge     check_last_carry
     b       adding
 
@@ -145,7 +145,7 @@ adding:
 
     // ulSum += oAddend1->aulDigits[lIndex]; 
     // if (ulSum < oAddend1->aulDigits[lIndex])
-    add x1, oAddend1, AULDIGITS
+    add     x1, oAddend1, AULDIGITS
     ldr     x0, [x1, lIndex, LSL 3]
     adds    ulSum, ulSum, x0
     bcs     overflow
