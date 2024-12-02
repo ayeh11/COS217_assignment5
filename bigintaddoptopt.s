@@ -29,12 +29,11 @@
         // Return 0 (FALSE) if an overflow occurred, and 1 (TRUE) 
         // otherwise.
         //--------------------------------------------------------------
-
+    
     // Local var registers
     oAddend1   .req x19
     oAddend2   .req x20
     oSum       .req x21
-    ulCarry    .req x22
     ulSum      .req x23
     lIndex     .req x24
     lSumLength .req x25
@@ -42,12 +41,12 @@
     .global BigInt_add
 
 BigInt_add:
-    // Prolog
+    // Prolog: Allocate stack space and save registers
     sub     sp, sp, 64
     stp     x19, x20, [sp, 0]
-    stp     x21, x22, [sp, 16]
+    stp     x21, x30, [sp, 16]    // Save oSum and link register
     stp     x23, x24, [sp, 32]
-    stp     x25, x30, [sp, 48]
+    stp     x25, xzr, [sp, 48]    // xzr is zero; no need to save other
     mov     oAddend1, x0 
     mov     oAddend2, x1 
     mov     oSum, x2 
@@ -56,8 +55,8 @@ BigInt_add:
     // lSumLength = (oAddend1->lLength > oAddend2->lLength) ? oAddend1->lLength : oAddend2->lLength
     ldr     x0, [oAddend1, LLENGTH]   // Load oAddend1->lLength into x0
     ldr     x1, [oAddend2, LLENGTH]   // Load oAddend2->lLength into x1
-    cmp     x0, x1                   // Compare lLength1 and lLength2
-    csel    x25, x0, x1, gt          // lSumLength = (x0 > x1) ? x0 : x1
+    cmp     x0, x1                    // Compare lLength1 and lLength2
+    csel    x25, x0, x1, gt           // lSumLength = (x0 > x1) ? x0 : x1
 
     // if (oSum->lLength > lSumLength)
     ldr     x0, [oSum, LLENGTH]
@@ -69,7 +68,7 @@ BigInt_add:
 clear_oSum:
     mov     x1, oSum
     add     x0, x1, AULDIGITS
-    mov     w1, 0
+    mov     x1, 0
     ldr     x2, =MAX_DIGITS_SIZE
     bl      memset
     b       add_loop_init
@@ -77,49 +76,28 @@ clear_oSum:
 skip_clear_oSum:
     b       add_loop_init
 
-// ulCarry = 0; lIndex = 0;
+// lIndex = 0; and clear carry flag
 add_loop_init:
-    mov     ulCarry, 0
+    adds    xzr, xzr, xzr
     mov     lIndex, 0
 
 // Guarded loop start
 add_loop:
-    // ulSum = ulCarry; ulCarry = 0;
-    mov     ulSum, ulCarry
-    mov     ulCarry, 0   
+    // Load oAddend1->aulDigits[lIndex] into x0
+    add     x2, oAddend1, AULDIGITS
+    ldr     x0, [x2, lIndex, LSL 3]
 
-    // ulSum += oAddend1->aulDigits[lIndex]; 
-    // if (ulSum < oAddend1->aulDigits[lIndex])
-    add x1, oAddend1, AULDIGITS
-    ldr     x0, [x1, lIndex, LSL 3]
-    adds    ulSum, ulSum, x0
-    bcs     overflow
-    b       add_second_addend
+    // Load oAddend2->aulDigits[lIndex] into x1
+    add     x3, oAddend2, AULDIGITS
+    ldr     x1, [x3, lIndex, LSL 3]
 
-// ulCarry = 1;
-overflow:
-    mov     ulCarry, 1
-    b       add_second_addend
+    // ulSum = x0 + x1 + carry; sets carry flag
+    adcs    ulSum, x0, x1                
 
-// ulSum += oAddend2->aulDigits[lIndex];
-// if (ulSum < oAddend2->aulDigits[lIndex])
-add_second_addend:
-    add     x1, oAddend2, AULDIGITS
-    ldr     x0, [x1, lIndex, LSL 3]
-    adds    ulSum, ulSum, x0
-    bcs     overflow2
-    b       store_sum
-
-// ulCarry = 1;
-overflow2:
-    mov     ulCarry, 1
-    b       store_sum
-
-// oSum->aulDigits[lIndex] = ulSum; lIndex++;
-store_sum:
-    add     x1, oSum, AULDIGITS
-    str     ulSum, [x1, lIndex, LSL 3]
-    add     lIndex, lIndex, 1
+    // Store the result in oSum->aulDigits[lIndex]
+    add     x4, oSum, AULDIGITS
+    str     ulSum, [x4, lIndex, LSL 3]
+    add     lIndex, lIndex, #1
 
     // end checks
     // lIndex < lSumLength
@@ -131,11 +109,9 @@ store_sum:
     bge     return_false
     b       add_loop
 
-// if (ulCarry != 1)
+// check if carry flag = 1
 check_last_carry:
-    cmp     ulCarry, 1
-    bne     set_length
-    b       final_carry
+    bcc    set_length
 
 // if (lSumLength == MAX_DIGITS) goto return_false;
 // oSum->aulDigits[lSumLength] = 1; lSumLength++;
@@ -164,11 +140,11 @@ return_true:
 
 return_end:
     // Epilog and return
-    ldp     x25, x30, [sp, 48]
+    ldp     x25, xzr, [sp, 48]
     ldp     x23, x24, [sp, 32]
-    ldp     x21, x22, [sp, 16]
+    ldp     x21, x30, [sp, 16]
     ldp     x19, x20, [sp, 0]
     add     sp, sp, 64
     ret
 
-    .size   BigInt_add, (. - BigInt_add)
+.size   BigInt_add, (. - BigInt_add)
