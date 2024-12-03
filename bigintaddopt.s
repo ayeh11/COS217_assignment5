@@ -28,6 +28,9 @@
         // Return the larger of lLength1 and lLength2.
         //--------------------------------------------------------------
 
+     // Must be a multiple of 16
+    .equ    BIGINT_LARGER_STACK_BYTECOUNT, 32
+
     // Parameter registers
     lLength1   .req x19
     lLength2   .req x20
@@ -37,9 +40,11 @@
 
 BigInt_larger:
     // Prolog
-    sub     sp, sp, 32 
-    stp     x19, x20, [sp, 0]
-    stp     x21, x30, [sp, 16]
+    sub     sp, sp, BIGINT_LARGER_STACK_BYTECOUNT
+    str     x30, [sp]
+    str     x19, [sp, 8] 
+    str     x20, [sp, 16]
+    str     x21, [sp, 24]
 
     // Move into registers
     mov     lLength1, x0
@@ -65,9 +70,11 @@ return_larger:
     mov     x0, lLarger
 
     // Epilog and return
-    ldp     x21, x30, [sp, 16]
-    ldp     x19, x20, [sp, 0]
-    add     sp, sp, 32
+    ldr     x30, [sp]
+    ldr     x19, [sp, 8] 
+    ldr     x20, [sp, 16]
+    ldr     x21, [sp, 24]
+    add     sp, sp, BIGINT_LARGER_STACK_BYTECOUNT
     ret
 
     .size   BigInt_larger, (. - BigInt_larger)
@@ -80,6 +87,9 @@ return_larger:
         // otherwise.
         //--------------------------------------------------------------
 
+    // Must be a multiple of 16
+    .equ    BIGINT_ADD_STACK_BYTECOUNT, 64
+    
     // Local var registers
     oAddend1   .req x19
     oAddend2   .req x20
@@ -93,11 +103,15 @@ return_larger:
 
 BigInt_add:
     // Prolog
-    sub     sp, sp, 64
-    stp     x19, x20, [sp, 0]
-    stp     x21, x22, [sp, 16]
-    stp     x23, x24, [sp, 32]
-    stp     x25, x30, [sp, 48]
+    sub     sp, sp, BIGINT_ADD_STACK_BYTECOUNT
+    str     x30, [sp]
+    str     x19, [sp, 8] 
+    str     x20, [sp, 16]
+    str     x21, [sp, 24]
+    str     x22, [sp, 32] 
+    str     x23, [sp, 40]
+    str     x24, [sp, 48]
+    str     x25, [sp, 56]
     mov     oAddend1, x0 
     mov     oAddend2, x1 
     mov     oSum, x2 
@@ -210,11 +224,15 @@ return_true:
 
 return_end:
     // Epilog and return
-    ldp     x25, x30, [sp, 48]
-    ldp     x23, x24, [sp, 32]
-    ldp     x21, x22, [sp, 16]
-    ldp     x19, x20, [sp, 0]
-    add     sp, sp, 64
+    ldr     x30, [sp]
+    ldr     x19, [sp, 8] 
+    ldr     x20, [sp, 16]
+    ldr     x21, [sp, 24]
+    ldr     x22, [sp, 32] 
+    ldr     x23, [sp, 40]
+    ldr     x24, [sp, 48]
+    ldr     x25, [sp, 56]
+    add     sp, sp, BIGINT_ADD_STACK_BYTECOUNT
     ret
 
     .size   BigInt_add, (. - BigInt_add)
