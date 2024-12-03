@@ -128,7 +128,8 @@ end_adding:
     // if (lSumLength != MAX_DIGITS) goto final_carry
     cmp     lSumLength, MAX_DIGITS
     bne     final_carry
-    b       return_false
+    mov     x0, FALSE
+    b       return_end
 
 // oSum->aulDigits[lSumLength] = 1; lSumLength++;
 final_carry:
@@ -143,15 +144,6 @@ set_length:
     mov     x0, oSum
     mov     x1, lSumLength 
     str     x1, [x0, LLENGTH] 
-    b       return_true
-
-// return FALSE;
-return_false:
-    mov     x0, FALSE
-    b       return_end
-
-// return TRUE;
-return_true:
     mov     x0, TRUE
 
 return_end:
