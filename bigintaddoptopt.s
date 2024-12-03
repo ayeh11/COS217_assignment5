@@ -30,6 +30,9 @@
         // otherwise.
         //--------------------------------------------------------------
     
+    // Must be a multiple of 16
+    .equ    BIGINTADD_STACK_BYTECOUNT, 64
+
     // Local var registers
     oAddend1   .req x19
     oAddend2   .req x20
@@ -42,11 +45,14 @@
 
 BigInt_add:
     // Prolog
-    sub     sp, sp, 64
-    stp     x19, x20, [sp, 0]
-    stp     x21, x22, [sp, 16]
-    stp     x23, x24, [sp, 32]
-    stp     x30, xzr, [sp, 48]
+    sub     sp, sp, BIGINTADD_STACK_BYTECOUNT
+    str     x30, [sp]
+    str     x19, [sp, 8] 
+    str     x20, [sp, 16]
+    str     x21, [sp, 24]
+    str     x22, [sp, 32] 
+    str     x23, [sp, 40]
+    str     x24, [sp, 48]
     mov     oAddend1, x0 
     mov     oAddend2, x1 
     mov     oSum, x2 
@@ -64,95 +70,109 @@ else:
     mov     lSumLength, x1
 
 endif:
-    // if (oSum->lLength > lSumLength)
+    // if (oSum->LLENGTH <= lSumLength) goto endif2;
     ldr     x0, [oSum, LLENGTH]
     cmp     x0, lSumLength
-    bgt     clear_oSum
-    b       skip_clear_oSum
+    ble     endif2   
 
-
-// memset(oSum->aulDigits, 0, MAX_DIGITS * sizeof(unsigned long));
-clear_oSum:
-    mov     x1, oSum
-    add     x0, x1, AULDIGITS
-    mov     x1, 0
-    mov     x2, MAX_DIGITS_SIZE
+    //  memset(oSum->AULDIGITS, 0, MAX_DIGITS * sizeof(unsigned long));
+    mov     x0, oSum
+    add     x0, x0, AULDIGITS
+    mov     w1, 0
+    mov     x2, MAX_DIGITS
     lsl     x2, x2, 3
-    bl      memset
-    b       add_loop_init
+    bl      memset 
 
-skip_clear_oSum:
-    b       add_loop_init
+endif2:
 
-// lIndex = 0; and clear carry flag
-add_loop_init:
-    adds    xzr, xzr, xzr
-    mov     lIndex, 0
+    // lIndex = 0;
+    mov     lIndex, xzr 
 
-// Guarded loop start
-add_loop:
-    // Load oAddend1->aulDigits[lIndex] into x0
-    add     x2, oAddend1, AULDIGITS
-    ldr     x0, [x2, lIndex, LSL 3]
+    // carry flag starts at 0  
+    adds    x0, xzr, xzr
 
-    // Load oAddend2->aulDigits[lIndex] into x1
-    add     x3, oAddend2, AULDIGITS
-    ldr     x1, [x3, lIndex, LSL 3]
+// if (lIndex >= lSumLength) goto endloop1
+// ignore carry flag since this interrupts endloop1 logic
 
-    // ulSum = x0 + x1 + carry; sets carry flag
-    adcs    ulSum, x0, x1                
+    sub     x0, lIndex, lSumLength
+    cbz     x0, endloop1
+ 
+loop1:
 
-    // Store the result in oSum->aulDigits[lIndex]
-    add     x1, oSum, AULDIGITS
-    str     ulSum, [x1, lIndex, LSL 3]
+    // ulSum = oAddend1->AULDIGITS[lIndex]
+    mov     x0, oAddend1
+    add     x0, x0, AULDIGITS 
+    ldr     ulSum, [x0, lIndex, lsl 3]
+
+    // ulSum += oAddend2->AULDIGITS[lIndex]
+    mov     x0, oAddend2
+    add     x0, x0, AULDIGITS
+    ldr     x0, [x0, lIndex, lsl 3]
+    adcs    ulSum, ulSum, x0
+
+    // oSum->AULDIGITS[lIndex] = ulSum
+    mov     x0, oSum
+    add     x0, x0, AULDIGITS
+    str     ulSum, [x0, lIndex, lsl 3]
+
+    // lIndex++
     add     lIndex, lIndex, 1
 
-    // end checks
-    // lIndex < lSumLength
-    cmp     lIndex, lSumLength   
-    bge     check_last_carry 
+    // if (lIndex != lSumLength) goto loop1
+    sub     x0, lSumLength, lIndex
+    cbnz    x0, loop1
 
-    // lIndex < MAX_DIGITS
-    cmp     lIndex, #MAX_DIGITS
-    bge     return_false
-    b       add_loop
+endloop1:
+    // goto endif5 when carry flag is not 1
+    mov     x0, xzr
+    adc     x0, xzr, xzr
+    cmp     x0, xzr
+    beq     endif5
 
-// check if carry flag = 1
-check_last_carry:
-    bcc    set_length
-
-// if (lSumLength == MAX_DIGITS) goto return_false;
-// oSum->aulDigits[lSumLength] = 1; lSumLength++;
-final_carry:
+    // if (lSumLength != MAX_DIGITS) goto endif6
     cmp     lSumLength, MAX_DIGITS
-    beq     return_false
-    add     x1, oSum, AULDIGITS
-    mov     x2, 1
-    str     x2, [x1, lSumLength, LSL 3]
-    add     lSumLength, lSumLength, 1
-    b       set_length
+    bne     endif6
 
-// oSum->lLength = lSumLength;
-set_length:
-    str     lSumLength, [oSum, LLENGTH]
-    b       return_true
-
-// return FALSE;
-return_false:
-    mov     w0, FALSE
-    b       return_end
-
-// return TRUE;
-return_true:
-    mov     w0, TRUE
-
-return_end:
-    // Epilog and return
-    ldp     x30, xzr, [sp, 48]
-    ldp     x23, x24, [sp, 32]
-    ldp     x21, x22, [sp, 16]
-    ldp     x19, x20, [sp, 0]
-    add     sp, sp, 64
+    // return FALSE
+    mov     x0, FALSE
+    ldr     x30, [sp]
+    ldr     x19, [sp, 8] 
+    ldr     x20, [sp, 16]
+    ldr     x21, [sp, 24]
+    ldr     x22, [sp, 32] 
+    ldr     x23, [sp, 40]
+    ldr     x24, [sp, 48]
+    ldr     x25, [sp, 56]
+    add     sp, sp, BIGINTADD_STACK_BYTECOUNT
     ret
+
+endif6:
+    // oSum->AULDIGITS[lSumLength] = 1
+    mov     x0, oSum
+    add     x0, x0, AULDIGITS
+    mov     x2, 1
+    str     x2, [x0, lSumLength, lsl 3]
+
+    // lSumLength++
+    add     lSumLength, lSumLength, 1 
+
+endif5:
+    // oSum->LLENGTH = lSumLength
+    mov     x0, oSum
+    mov     x1, lSumLength 
+    str     x1, [x0, LLENGTH] 
+
+    // Epilog and return TRUE
+    mov     x0, TRUE
+    ldr     x30, [sp]
+    ldr     x19, [sp, 8] 
+    ldr     x20, [sp, 16]
+    ldr     x21, [sp, 24]
+    ldr     x22, [sp, 32] 
+    ldr     x23, [sp, 40]
+    ldr     x24, [sp, 48]
+    ldr     x25, [sp, 56] 
+    add     sp, sp, BIGINTADD_STACK_BYTECOUNT
+    ret 
 
 .size   BigInt_add, (. - BigInt_add)
