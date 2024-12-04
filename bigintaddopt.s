@@ -34,6 +34,8 @@
     // Parameter registers
     lLength1   .req x19
     lLength2   .req x20
+
+    // Local variable registers
     lLarger    .req x21
 
     .global BigInt_larger
@@ -133,7 +135,7 @@ BigInt_add:
 clear_oSum:
     mov     x1, oSum   
     add     x0, x1, AULDIGITS
-    mov     x1, 0
+    mov     w1, 0
     ldr     x2, =MAX_DIGITS_SIZE
     bl      memset
     b       add_loop
@@ -160,7 +162,7 @@ adding:
     // ulSum += oAddend1->aulDigits[lIndex]; 
     // if (ulSum < oAddend1->aulDigits[lIndex])
     add     x1, oAddend1, AULDIGITS
-    ldr     x0, [x1, lIndex, LSL 3]
+    ldr     x0, [x1, lIndex, lsl 3]
     adds    ulSum, ulSum, x0
     bcs     overflow
     b       add_second_addend
@@ -174,7 +176,7 @@ overflow:
 // if (ulSum < oAddend2->aulDigits[lIndex])
 add_second_addend:
     add     x1, oAddend2, AULDIGITS
-    ldr     x0, [x1, lIndex, LSL 3]
+    ldr     x0, [x1, lIndex, lsl 3]
     adds    ulSum, ulSum, x0
     bcs     overflow2
     b       store_sum
@@ -187,7 +189,7 @@ overflow2:
 // oSum->aulDigits[lIndex] = ulSum; lIndex++;
 store_sum:
     add     x1, oSum, AULDIGITS
-    str     ulSum, [x1, lIndex, LSL 3]
+    str     ulSum, [x1, lIndex, lsl 3]
     add     lIndex, lIndex, 1
     b       add_loop_condition
 
@@ -204,7 +206,7 @@ final_carry:
     beq     return_false
     add     x1, oSum, AULDIGITS
     mov     x2, 1
-    str     x2, [x1, lSumLength, LSL 3]
+    str     x2, [x1, lSumLength, lsl 3]
     add     lSumLength, lSumLength, 1
     b       set_length
 

@@ -58,7 +58,8 @@ BigInt_add:
     mov     oSum, x2 
 
     // Inline BigInt_larger:
-    // lSumLength = (oAddend1->lLength > oAddend2->lLength) ? oAddend1->lLength : oAddend2->lLength
+    // lSumLength = (oAddend1->lLength > oAddend2->lLength) 
+    // ? oAddend1->lLength : oAddend2->lLength
     ldr     x0, [oAddend1, LLENGTH]   // Load oAddend1->lLength into x0
     ldr     x1, [oAddend2, LLENGTH]   // Load oAddend2->lLength into x1
     cmp     x0, x1                    // Compare lLength1 and lLength2
@@ -75,11 +76,11 @@ check_if_clear:
     cmp     x0, lSumLength
     ble     add_loop_init   
 
-//  memset(oSum->AULDIGITS, 0, MAX_DIGITS * sizeof(unsigned long));
+    // memset(oSum->AULDIGITS, 0, MAX_DIGITS * sizeof(unsigned long));
 clear_oSum:
     mov     x1, oSum   
     add     x0, x1, AULDIGITS
-    mov     x1, 0
+    mov     w1, 0
     ldr     x2, =MAX_DIGITS_SIZE
     bl      memset
 
@@ -96,19 +97,16 @@ add_loop_condition:
  
 adding:
     // ulSum = oAddend1->AULDIGITS[lIndex]
-    mov     x0, oAddend1
-    add     x0, x0, AULDIGITS 
+    add     x0, oAddend1, AULDIGITS 
     ldr     ulSum, [x0, lIndex, lsl 3]
 
     // ulSum += oAddend2->AULDIGITS[lIndex]
-    mov     x0, oAddend2
-    add     x0, x0, AULDIGITS
+    add     x0, oAddend2, AULDIGITS
     ldr     x0, [x0, lIndex, lsl 3]
     adcs    ulSum, ulSum, x0
 
     // oSum->AULDIGITS[lIndex] = ulSum
-    mov     x0, oSum
-    add     x0, x0, AULDIGITS
+    add     x0, oSum, AULDIGITS
     str     ulSum, [x0, lIndex, lsl 3]
 
     // lIndex++
@@ -132,8 +130,7 @@ end_adding:
 
 // oSum->aulDigits[lSumLength] = 1; lSumLength++;
 final_carry:
-    mov     x0, oSum
-    add     x0, x0, AULDIGITS
+    add     x0, oSum, AULDIGITS
     mov     x2, 1
     str     x2, [x0, lSumLength, lsl 3]
     add     lSumLength, lSumLength, 1 
@@ -164,6 +161,6 @@ return_end:
     ldr     x23, [sp, 40]
     ldr     x24, [sp, 48]
     add     sp, sp, BIGINT_ADD_STACK_BYTECOUNT
-    ret 
+    ret
 
 .size   BigInt_add, (. - BigInt_add)

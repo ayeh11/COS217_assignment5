@@ -44,11 +44,9 @@ BigInt_larger:
     sub     sp, sp, BIGINT_LARGER_STACK_BYTECOUNT
     str     x30, [sp, X30_OFFSET]
 
-    // Store and load
+    // Store
     str     x0, [sp, LLENGTH1_OFFSET]
     str     x1, [sp, LLENGTH2_OFFSET]
-    ldr     x0, [sp, LLENGTH1_OFFSET]
-    ldr     x1, [sp, LLENGTH2_OFFSET]
 
     // if (lLength1 > lLength2) 
     cmp     x0, x1
