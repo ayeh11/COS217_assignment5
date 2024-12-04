@@ -3,12 +3,12 @@ Assignment 5 readme File
 ------------------------------------------------------------------------
 Student 1: What is your name?
 
-
+Annika Yeh
 
 ------------------------------------------------------------------------
 Student 2: What is your name?
 
-
+William Oh
 
 ------------------------------------------------------------------------
 Student 1: What authorized sources of information did you use to
@@ -17,7 +17,20 @@ information given in the "Policies" web page (also available on armlab
 in the file ~cos217/AuthorizedSourcesList ) to this section of the
 readme file, and edit it as appropriate.
 
+The course's lectures.
 
+The course's precepts.
+
+The course's website.
+
+Documents that are referenced directly by the course's website. Such 
+documents include the course's lecture slides and precept handouts.
+
+The course's textbooks and reference manuals.
+
+The man pages on the armlab cluster.
+
+The course's current staff members outside of class time through Ed.
 
 ------------------------------------------------------------------------
 Student 2: What authorized sources of information did you use to
@@ -26,7 +39,20 @@ information given in the "Policies" web page (also available on armlab
 in the file ~cos217/AuthorizedSourcesList ) to this section of the
 readme file, and edit it as appropriate.
 
+The course's lectures.
 
+The course's precepts.
+
+The course's website.
+
+Documents that are referenced directly by the course's website. Such 
+documents include the course's lecture slides and precept handouts.
+
+The course's textbooks and reference manuals.
+
+The man pages on the armlab cluster.
+
+The course's current staff members outside of class time through Ed.
 
 ------------------------------------------------------------------------
 Student 1: What unauthorized sources of information did you use to
@@ -40,7 +66,7 @@ nature of the interaction, may additionally require the interaction
 being reported to the Committee on Discipline. Write "None" if you used
 no unauthorized sources of information.
 
-
+None
 
 ------------------------------------------------------------------------
 Student 2: What unauthorized sources of information did you use to
@@ -54,7 +80,7 @@ nature of the interaction, may additionally require the interaction
 being reported to the Committee on Discipline. Write "None" if you used
 no unauthorized sources of information.
 
-
+None
 
 ------------------------------------------------------------------------
 Student 1: In fulfillment of the requirement from section 2.4.3 of the
@@ -64,7 +90,7 @@ guide, enter your name in the space below the following affirmation:
 This paper represents my own work in accordance with University
 regulations.
 
-
+Annika Yeh 
 
 ------------------------------------------------------------------------
 Student 2: In fulfillment of the requirement from section 2.4.3 of the
@@ -74,19 +100,19 @@ guide, enter your name in the space below the following affirmation:
 This paper represents my own work in accordance with University
 regulations.
 
-
+William Oh
 
 ------------------------------------------------------------------------
 Student 1: What is your assessment of the assignment? Was it helpful?
 Was it fun?
 
-
+It was helpful to learn assembly.
 
 ------------------------------------------------------------------------
 Student 2: What is your assessment of the assignment? Was it helpful?
 Was it fun?
 
-
+It was helpful.
 
 ------------------------------------------------------------------------
 (optional) What information can you provide about your submission that
@@ -210,16 +236,12 @@ expose an issue. The program should report 513 lines, 1463 words, and
 What are the CPU times consumed by the programs from Parts 2a, 2b, 2d,
 2e, and 2f to compute fib(250000) on armlab? Fill in the blanks.
 
-Part 2a:  11.981942 seconds
+Part 2a:  11.974725 seconds
 
-Part 2b:  2.616389 seconds
+Part 2b:  2.631146 seconds
 
 Part 2d:  8.580985 seconds
 
 Part 2e:  4.233605 seconds
 
-Part 2f:  2.362126 seconds
-
-
-
-
+Part 2f:  2.013279 seconds
